@@ -1,0 +1,169 @@
+/* =========================================================================
+	THEME — single source of truth. Neutral, content-first palette (no blue).
+	Muted sage accent. Supports light + dark via [data-theme] on <html>;
+   defaults to OS preference.
+   ========================================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Geist+Mono:wght@500;700&display=swap');
+
+/* ---- Light mode (default) ---------------------------------------------- */
+:root,
+:root[data-theme='light'] {
+	color-scheme: light;
+
+	--accent: #4f624b;
+	--accent-2: #ea580c;
+	--accent-fg: #ffffff;
+	--accent-ink: #1a2e05;
+
+	--bg: #fafaf9;
+	--surface: #ffffff;
+	--surface-2: #f4f4f5;
+	--surface-3: #e7e7ea;
+	--border: rgba(9, 9, 11, 0.08);
+	--border-strong: rgba(9, 9, 11, 0.16);
+	--text: #18181b;
+	--muted: #52525b;
+	--muted-2: #71717a;
+
+	--danger: #dc2626;
+	--success: #4f624b;
+	--warning: #d97706;
+	/* orange-700: darker than accent-2 so white-on-live badges clear AA 4.5:1 */
+	--live: #c2410c;
+	--gold: #b45309;
+
+	--shadow-tile: 0 1px 2px rgba(9, 9, 11, 0.04), 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+	--shadow-pop: 0 12px 32px -18px rgba(9, 9, 11, 0.18);
+	--glow: 0 0 0 1px rgba(79, 98, 75, 0.35);
+
+	--bg-atmosphere: none;
+	--grain-opacity: 0;
+}
+
+/* ---- Dark mode ------------------------------------------------------- */
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	--accent: #a7b59a;
+	--accent-2: #fb923c;
+	--accent-fg: #0a0a0a;
+	--accent-ink: #0a0a0a;
+
+	--bg: #0b0b0d;
+	--surface: #141416;
+	--surface-2: #1c1c20;
+	--surface-3: #27272a;
+	--border: rgba(255, 255, 255, 0.07);
+	--border-strong: rgba(255, 255, 255, 0.14);
+	--text: #f4f4f5;
+	--muted: #a1a1aa;
+	--muted-2: #71717a;
+
+	--danger: #ef4444;
+	--success: #9dbb84;
+	--warning: #f59e0b;
+	--live: #fb923c;
+	--gold: #fbbf24;
+
+	--shadow-tile: 0 1px 0 rgba(255, 255, 255, 0.035) inset;
+	--shadow-pop: 0 10px 30px -16px rgba(0, 0, 0, 0.65);
+	--glow: 0 0 0 1px rgba(167, 181, 154, 0.35);
+
+	--bg-atmosphere: none;
+	--grain-opacity: 0;
+}
+
+/* ---- VM / World Cup mode -------------------------------------------- */
+:root[data-theme='worldcup'] {
+	color-scheme: dark;
+
+	--accent: #8fc58f;
+	--accent-2: #d8b86c;
+	--accent-fg: #071019;
+	--accent-ink: #071019;
+
+	--bg: #071019;
+	--surface: #0b171f;
+	--surface-2: #10242b;
+	--surface-3: #18343a;
+	--border: rgba(214, 190, 128, 0.09);
+	--border-strong: rgba(214, 190, 128, 0.17);
+	--text: #f3f6ee;
+	--muted: #a7b7ae;
+	--muted-2: #72867d;
+
+	--danger: #f87171;
+	--success: #8fc58f;
+	--warning: #e3bb67;
+	--live: #f9a66a;
+	--gold: #d9bb72;
+
+	--shadow-tile: 0 1px 0 rgba(255, 255, 255, 0.035) inset, 0 18px 46px -34px rgba(0, 0, 0, 0.9);
+	--shadow-pop: 0 18px 48px -24px rgba(0, 0, 0, 0.86);
+	--glow: 0 0 0 1px rgba(217, 187, 114, 0.22), 0 0 28px rgba(93, 155, 101, 0.13);
+
+	--bg-atmosphere:
+		radial-gradient(72% 38% at 52% -10%, rgba(217, 187, 114, 0.09), transparent 62%),
+		radial-gradient(54% 34% at 50% 0%, rgba(73, 145, 95, 0.18), transparent 72%),
+		linear-gradient(180deg, #081824 0%, #071019 50%, #050a0f 100%);
+	--pitch-line: rgba(165, 218, 158, 0.075);
+	--pitch-line-soft: rgba(165, 218, 158, 0.038);
+	--gold-line: rgba(232, 197, 116, 0.18);
+	--grain-opacity: 0;
+}
+
+/* OS preference if no explicit choice. */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) {
+		color-scheme: dark;
+		--accent: #a7b59a;
+		--accent-2: #fb923c;
+		--accent-fg: #0a0a0a;
+		--accent-ink: #0a0a0a;
+		--bg: #0b0b0d;
+		--surface: #141416;
+		--surface-2: #1c1c20;
+		--surface-3: #27272a;
+		--border: rgba(255, 255, 255, 0.07);
+		--border-strong: rgba(255, 255, 255, 0.14);
+		--text: #f4f4f5;
+		--muted: #a1a1aa;
+		--muted-2: #71717a;
+		--danger: #ef4444;
+		--success: #9dbb84;
+		--warning: #f59e0b;
+		--live: #fb923c;
+		--gold: #fbbf24;
+		--shadow-tile: 0 1px 0 rgba(255, 255, 255, 0.035) inset;
+		--shadow-pop: 0 10px 30px -16px rgba(0, 0, 0, 0.65);
+		--glow: 0 0 0 1px rgba(167, 181, 154, 0.35);
+	}
+}
+
+:root {
+	--ring: 2px solid var(--accent);
+	--radius: 18px;
+	--radius-sm: 12px;
+	--radius-pill: 999px;
+
+	/* Typography — Outfit for display, Inter for body */
+	--font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-display: 'Outfit', system-ui, sans-serif;
+	--font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', monospace;
+
+	--maxw: 760px;
+	--nav-h: 68px;
+	--topbar-h: 60px;
+	--rail-w: 248px;
+}
+
+@media (min-width: 900px) {
+	:root { --maxw: 1440px; }
+}
+@media (min-width: 1500px) {
+	:root { --maxw: 1560px; }
+}
+
+html {
+	transition: background-color 0.2s ease, color 0.2s ease;
+}

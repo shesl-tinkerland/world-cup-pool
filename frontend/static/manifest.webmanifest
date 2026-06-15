@@ -1,0 +1,29 @@
+{
+  "id": "/",
+  "name": "VM Tipping",
+  "short_name": "VM Tipping",
+  "description": "Kamptips og VM-tips for fotball-VM 2026.",
+  "lang": "no",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#fafaf9",
+  "theme_color": "#fafaf9",
+  "categories": ["sports", "games"],
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/maskable_icon_x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable_icon_x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable_icon_x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable_icon_x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "/screenshots/pwa-mobile-home.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "Oversikt over manglende kamptips" },
+    { "src": "/screenshots/pwa-mobile-kamptips.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "Gi kamptips direkte fra mobilen" },
+    { "src": "/screenshots/pwa-desktop-home.png", "sizes": "1140x834", "type": "image/png", "form_factor": "wide", "label": "Oversikt over manglende kamptips og VM-tips" },
+    { "src": "/screenshots/pwa-desktop-kamptips.png", "sizes": "1140x834", "type": "image/png", "form_factor": "wide", "label": "Gi kamptips direkte i kampoversikten" }
+  ]
+}

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="VM Tipping">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/>
+      <stop offset=".55" stop-color="#ffcf3a"/>
+      <stop offset="1" stop-color="#b88408"/>
+    </linearGradient>
+    <linearGradient id="gBase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#23304a"/>
+      <stop offset="1" stop-color="#0e1422"/>
+    </linearGradient>
+    <radialGradient id="gGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#c8fb50" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#c8fb50" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="28" r="26" fill="url(#gGlow)"/>
+  <ellipse cx="32" cy="15" rx="9" ry="9" fill="url(#gGold)" stroke="#7a5300" stroke-width=".6"/>
+  <path d="M23 15 Q32 11 41 15" fill="none" stroke="#7a5300" stroke-width=".6" opacity=".7"/>
+  <path d="M24 18 Q32 22 40 18" fill="none" stroke="#7a5300" stroke-width=".6" opacity=".7"/>
+  <ellipse cx="32" cy="15" rx="3.2" ry="9" fill="none" stroke="#7a5300" stroke-width=".5" opacity=".55"/>
+  <path d="M22 22 C22 28 25 33 28 36 L28 42 L36 42 L36 36 C39 33 42 28 42 22 C38 26 35 28 32 28 C29 28 26 26 22 22 Z" fill="url(#gGold)" stroke="#7a5300" stroke-width=".6"/>
+  <path d="M27 32 Q32 34 37 32" fill="none" stroke="#fff5c2" stroke-width=".6" opacity=".6"/>
+  <rect x="24" y="42" width="16" height="4" rx="1" fill="url(#gBase)"/>
+  <rect x="22" y="46" width="20" height="5" rx="1.5" fill="url(#gBase)"/>
+  <rect x="20" y="51" width="24" height="5" rx="2" fill="url(#gBase)"/>
+  <rect x="18" y="57" width="28" height="2" rx="1" fill="#c8fb50"/>
+</svg>
+

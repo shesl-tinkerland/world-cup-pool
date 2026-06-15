@@ -1,0 +1,608 @@
+/* Design system — structure + FLOODLIGHT treatment. ALL colours/fonts/radii
+   come from the tokens in ./lib/theme.css (the single place to re-theme). */
+@import './lib/theme.css';
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	background: var(--bg-atmosphere), var(--bg);
+	color: var(--text);
+	font-family: var(--font);
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+body {
+	min-height: 100dvh;
+	background: var(--bg-atmosphere), var(--bg);
+	position: relative;
+}
+
+:root[data-theme='worldcup'],
+:root[data-theme='worldcup'] body {
+	overflow-x: hidden;
+}
+
+/* Subtle theme-aware noise (off by default). Reactivate by overriding
+   --grain-opacity in theme.css if a textured look is desired. */
+body::after {
+	content: none;
+}
+
+:root[data-theme='worldcup'] body::before {
+	content: '';
+	position: fixed;
+	pointer-events: none;
+}
+
+:root[data-theme='worldcup'] body::before {
+	inset: 0;
+	z-index: 0;
+	background:
+		radial-gradient(ellipse at 50% 6%, rgba(143, 197, 143, 0.08), transparent 36%),
+		radial-gradient(ellipse at 82% 0%, rgba(232, 197, 116, 0.055), transparent 30%),
+		radial-gradient(ellipse at 20% 12%, rgba(232, 197, 116, 0.04), transparent 26%);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.74), transparent 70%);
+	opacity: 0.68;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+}
+
+/* Headlines — clean, tight, modern (no condensed poster look). */
+h1,
+h2 {
+	font-family: var(--font-display);
+	font-weight: 600;
+	letter-spacing: -0.03em;
+	margin: 0;
+	line-height: 1.08;
+}
+h1 {
+	font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+}
+h2 {
+	font-size: clamp(1.3rem, 3.2vw, 1.7rem);
+}
+h3 {
+	font-family: var(--font-display);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	margin: 0;
+	line-height: 1.2;
+	font-size: 1.05rem;
+}
+
+/* Eyebrow / kicker. */
+.kicker {
+	font-family: var(--font);
+	font-weight: 500; /* Reduced font-weight for kicker */
+	font-size: 0.7rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+/* Scoreboard digits. */
+.digits {
+	font-family: var(--font-mono);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
+}
+
+.app-shell {
+	position: relative;
+	z-index: 2;
+	max-width: var(--maxw);
+	margin: 0 auto;
+	padding: 1rem;
+}
+.app-shell.with-chrome {
+	padding-top: calc(var(--topbar-h) + 1.25rem);
+	padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 2rem);
+}
+
+@media (min-width: 900px) {
+	.app-shell.with-chrome {
+		padding: 2rem;
+		padding-left: calc(var(--rail-w) + 2.5rem);
+	}
+}
+
+/* ---- Cards (bento tiles) ---- */
+.card {
+	position: relative;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: 1.35rem;
+	overflow: clip;
+	box-shadow: var(--shadow-tile);
+	transition: border-color 0.25s ease-out, background 0.25s ease-out, transform 0.25s ease-out;
+}
+.card:hover {
+	border-color: var(--border-strong);
+	transform: translateY(-2px);
+}
+.card + .card {
+	margin-top: 0.85rem;
+}
+
+:root[data-theme='worldcup'] .card {
+	background:
+		radial-gradient(circle at 18% 0%, rgba(217, 187, 114, 0.055), transparent 32%),
+		linear-gradient(180deg, rgba(13, 34, 40, 0.95), rgba(8, 21, 30, 0.98)),
+		var(--surface);
+	border-color: var(--border);
+	box-shadow: var(--shadow-tile);
+}
+:root[data-theme='worldcup'] .card::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background:
+		linear-gradient(120deg, rgba(246, 225, 176, 0.07), rgba(217, 187, 114, 0.026) 30%, transparent 58%),
+		radial-gradient(circle at 18% 0%, rgba(143, 197, 143, 0.08), transparent 34%);
+	opacity: 0.56;
+	mask-image: linear-gradient(135deg, rgba(0, 0, 0, 0.74), transparent 82%);
+}
+:root[data-theme='worldcup'] .card > * {
+	position: relative;
+	z-index: 1;
+}
+:root[data-theme='worldcup'] .card:hover {
+	border-color: var(--border-strong);
+}
+
+/* Bento grid — progressively snaps to wider columns for smoother breakpoint
+   transitions (2 → 4 → 6 → 12). */
+.bento {
+	display: grid;
+	gap: 0.9rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-auto-rows: minmax(120px, auto);
+}
+@media (max-width: 520px) {
+	.bento { grid-template-columns: minmax(0, 1fr); }
+}
+@media (min-width: 640px) {
+	.bento { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+}
+@media (min-width: 900px) {
+	.bento { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.05rem; }
+}
+@media (min-width: 1200px) {
+	.bento { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 1.1rem; }
+}
+@media (min-width: 1400px) {
+	.bento { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.15rem; }
+}
+
+.card .card + .card { margin-top: 0; }
+
+/* ---- Buttons: modern pill, bento-friendly ---- */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	width: 100%;
+	padding: 0.85rem 1.1rem;
+	border: 1px solid var(--text);
+	border-radius: var(--radius-pill);
+	background: var(--text);
+	color: var(--bg);
+	font-family: var(--font);
+	font-weight: 700;
+	font-size: 0.95rem;
+	letter-spacing: 0.01em;
+	cursor: pointer;
+	transition:
+		transform 0.12s ease,
+		box-shadow 0.2s ease,
+		filter 0.15s ease;
+}
+.btn:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-pop);
+}
+.btn:active:not(:disabled) {
+	transform: translateY(0);
+}
+.btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+.btn.secondary {
+	background: var(--surface-2);
+	border-color: var(--border);
+	color: var(--text);
+}
+.btn.secondary:hover:not(:disabled) {
+	box-shadow: none;
+	border-color: var(--border-strong);
+}
+.btn.ghost {
+	background: transparent;
+	border-color: transparent;
+	color: var(--text);
+}
+.btn.ghost:hover:not(:disabled) {
+	box-shadow: none;
+}
+
+/* ---- Keyboard focus: visible ring on interactive elements ---- */
+/* (.input has its own :focus ring above; these cover buttons + custom links
+   so keyboard users never lose track of focus.) */
+.btn:focus-visible,
+.action-link:focus-visible,
+.hdlink:focus-visible,
+.chat-preview:focus-visible,
+.mini-lb-row:focus-visible,
+.seg button:focus-visible,
+.tabs button:focus-visible,
+.links a:focus-visible {
+	outline: var(--ring);
+	outline-offset: 2px;
+}
+
+/* ---- Inputs ---- */
+.field {
+	display: block;
+	margin-bottom: 0.85rem;
+}
+.field label {
+	display: block;
+	font-size: 0.78rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--muted);
+	margin-bottom: 0.4rem;
+}
+.input {
+	width: 100%;
+	padding: 0.8rem 0.9rem;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	color: var(--text);
+	font: inherit;
+	font-size: 1rem;
+}
+.input:focus {
+	outline: var(--ring);
+	outline-offset: -1px;
+}
+
+.muted {
+	color: var(--muted);
+}
+.error {
+	color: var(--danger);
+	font-size: 0.9rem;
+}
+.row {
+	display: flex;
+	gap: 0.6rem;
+	align-items: center;
+}
+.spacer {
+	flex: 1;
+}
+
+/* ---- Pills / tags ---- */
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	white-space: nowrap;
+	flex: none;
+	font-weight: 700;
+	font-size: 0.68rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	background: var(--surface-2);
+	border: 1px solid var(--border);
+	color: var(--muted);
+	padding: 0.25rem 0.6rem;
+	border-radius: var(--radius-pill);
+}
+.pill.ok {
+	color: var(--accent);
+	border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+.pill.live {
+	color: var(--bg);
+	background: var(--live);
+	border-color: var(--live);
+}
+
+:root[data-theme='worldcup'] .pill {
+	border-color: color-mix(in srgb, var(--gold) 10%, var(--border));
+	background: color-mix(in srgb, var(--surface-2) 84%, transparent);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+/* ---- Segmented control (tabs) shared look — modern pill style ---- */
+.seg,
+.tabs {
+	display: flex;
+	gap: 0.5rem;
+	padding: 0.2rem 0;
+	background: transparent;
+	border: none;
+	width: 100%;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.seg::-webkit-scrollbar,
+.tabs::-webkit-scrollbar {
+	display: none;
+}
+.seg button,
+.tabs button {
+	flex: 1;
+	min-width: max-content;
+	min-height: 44px;
+	position: relative;
+	padding: 0.6rem 1.1rem;
+	background: var(--surface-2);
+	border: 1px solid transparent;
+	border-radius: var(--radius-pill);
+	color: var(--muted);
+	font: inherit;
+	font-weight: 650;
+	font-size: 0.86rem;
+	text-transform: none;
+	cursor: pointer;
+	white-space: nowrap;
+	transition:
+		color 0.15s ease,
+		background 0.15s ease,
+		border-color 0.15s ease,
+		box-shadow 0.15s ease,
+		transform 0.1s ease;
+}
+.seg button:hover:not(.on):not(.active),
+.tabs button:hover:not(.on):not(.active) {
+	color: var(--text);
+	background: color-mix(in srgb, var(--surface-3) 50%, transparent);
+}
+.seg button.on,
+.seg button.active,
+.tabs button.on,
+.tabs button.active {
+	background: var(--text);
+	color: var(--bg);
+	border-color: var(--text);
+	box-shadow: var(--shadow-pop);
+}
+
+:root[data-theme='worldcup'] .seg button,
+:root[data-theme='worldcup'] .tabs button {
+	background: color-mix(in srgb, var(--surface-2) 84%, transparent);
+	border-color: color-mix(in srgb, var(--border) 78%, transparent);
+	color: color-mix(in srgb, var(--muted) 90%, var(--text));
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+:root[data-theme='worldcup'] .seg button:hover:not(.on):not(.active),
+:root[data-theme='worldcup'] .tabs button:hover:not(.on):not(.active) {
+	background: color-mix(in srgb, var(--surface-3) 64%, transparent);
+	border-color: color-mix(in srgb, var(--accent) 16%, var(--border));
+	color: var(--text);
+}
+:root[data-theme='worldcup'] .seg button.on,
+:root[data-theme='worldcup'] .seg button.active,
+:root[data-theme='worldcup'] .tabs button.on,
+:root[data-theme='worldcup'] .tabs button.active {
+	background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 34%, var(--surface-2)), var(--surface-2));
+	border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+	color: var(--text);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 12px 30px -24px rgba(0, 0, 0, 0.8);
+}
+
+:root[data-theme='worldcup'] .stickyhead {
+	background: transparent !important;
+	border-bottom-color: transparent !important;
+	box-shadow: none !important;
+	backdrop-filter: none;
+}
+
+:root[data-theme='worldcup'] .input,
+:root[data-theme='worldcup'] .field input,
+:root[data-theme='worldcup'] .field select,
+:root[data-theme='worldcup'] .field textarea,
+:root[data-theme='worldcup'] select {
+	background: color-mix(in srgb, var(--surface-2) 78%, transparent);
+	border-color: var(--border);
+	color: var(--text);
+}
+
+/* Collapsible part of a sticky header — hidden once scrolled (the
+   collapseOnScroll action toggles .scrolled on .stickyhead). */
+/* Animate the REAL height (grid 1fr<->0fr) so it can't overshoot/pop like a
+   max-height guess. .sh-expand must hold exactly one child (.sh-inner). */
+.sh-expand {
+	display: grid;
+	grid-template-rows: 1fr;
+	transition:
+		grid-template-rows 0.26s ease,
+		opacity 0.2s ease;
+	opacity: 1;
+}
+.sh-expand > .sh-inner {
+	min-height: 0;
+	overflow: hidden;
+}
+.stickyhead.scrolled .sh-expand {
+	grid-template-rows: 0fr;
+	opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+	.sh-expand {
+		transition: none;
+	}
+}
+
+/* ---- Page-load reveal ---- */
+@keyframes rise {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+.stagger > * {
+	animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.stagger > *:nth-child(1) {
+	animation-delay: 0.02s;
+}
+.stagger > *:nth-child(2) {
+	animation-delay: 0.07s;
+}
+.stagger > *:nth-child(3) {
+	animation-delay: 0.12s;
+}
+.stagger > *:nth-child(4) {
+	animation-delay: 0.17s;
+}
+.stagger > *:nth-child(5) {
+	animation-delay: 0.22s;
+}
+.stagger > *:nth-child(n + 6) {
+	animation-delay: 0.27s;
+}
+@media (prefers-reduced-motion: reduce) {
+	.stagger > *,
+	.btn {
+		animation: none;
+		transition: none;
+	}
+}
+
+/* ---- Mobile top header ---- */
+.topbar {
+	position: fixed;
+	inset: 0 0 auto 0;
+	height: var(--topbar-h);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0 1rem;
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
+	z-index: 50;
+}
+
+:root[data-theme='worldcup'] .topbar {
+	background: color-mix(in srgb, var(--surface) 90%, transparent);
+	border-bottom-color: var(--border);
+	backdrop-filter: blur(18px);
+}
+
+/* ---- Mobile bottom tab bar ---- */
+.tabbar {
+	position: fixed;
+	left: max(0.75rem, env(safe-area-inset-left));
+	right: max(0.75rem, env(safe-area-inset-right));
+	bottom: max(0.75rem, env(safe-area-inset-bottom));
+	height: 64px;
+	display: flex;
+	align-items: center;
+	padding: 0.3rem;
+	background: color-mix(in srgb, var(--surface) 92%, transparent);
+	border: 1px solid var(--border);
+	border-radius: 24px;
+	box-shadow: var(--shadow-pop);
+	backdrop-filter: blur(18px);
+	z-index: 55;
+	overflow: hidden;
+}
+
+:root[data-theme='worldcup'] .tabbar {
+	background: color-mix(in srgb, var(--surface) 88%, transparent);
+	border-color: var(--border);
+	box-shadow: 0 18px 42px -24px rgba(0, 0, 0, 0.82), inset 0 1px 0 rgba(232, 197, 116, 0.08);
+}
+
+.siderail {
+	display: none;
+}
+
+@media (min-width: 900px) {
+	.topbar,
+	.tabbar {
+		display: none;
+	}
+	.siderail {
+		position: fixed;
+		inset: 0 auto 0 0;
+		width: var(--rail-w);
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		padding: 1.6rem 0;
+		background: var(--surface);
+		border-right: 1px solid var(--border);
+		z-index: 50;
+	}
+	:root[data-theme='worldcup'] .siderail {
+		overflow: hidden;
+		background:
+			linear-gradient(180deg, rgba(12, 29, 39, 0.96), rgba(5, 13, 20, 0.98)),
+			var(--surface);
+		border-right-color: var(--border);
+		box-shadow: inset -1px 0 0 rgba(232, 197, 116, 0.08);
+	}
+	:root[data-theme='worldcup'] .siderail > * {
+		position: relative;
+		z-index: 1;
+	}
+	:root[data-theme='worldcup'] .siderail::after {
+		content: '';
+		position: absolute;
+		left: -5.4rem;
+		bottom: 16rem;
+		z-index: 0;
+		width: 20rem;
+		height: 12rem;
+		pointer-events: none;
+		background: url('/theme/vm_tips-clean.png') right center / contain no-repeat;
+		filter: brightness(0.6) contrast(0.92) saturate(0.78);
+		mix-blend-mode: normal;
+		opacity: 0.3;
+		mask-image:
+			linear-gradient(90deg, transparent 0 8%, rgba(0, 0, 0, 0.68) 28%, black 58%, rgba(0, 0, 0, 0.56) 82%, transparent 100%),
+			linear-gradient(to bottom, transparent 0, black 18%, black 82%, transparent 100%);
+	}
+	.rail-logo {
+		padding: 0 1.5rem 0.8rem;
+	}
+	.rail-user {
+		padding: 0.9rem 1.5rem 0;
+		border-top: 1px solid var(--border);
+	}
+	.rail-actions {
+		display: flex;
+		gap: 0.55rem;
+		padding: 0 1.5rem 0.6rem;
+	}
+	.rail-search {
+		padding: 0 1.5rem 0.35rem;
+	}
+}

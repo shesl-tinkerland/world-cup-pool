@@ -1,0 +1,230 @@
+<script lang="ts">
+	import { auth } from '$lib/auth.svelte';
+	import Logo from '$lib/components/Logo.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { language } from '$lib/language.svelte';
+	import { strings } from '$lib/strings';
+
+	let identity = $state('');
+	let password = $state('');
+	let error = $state('');
+	let busy = $state(false);
+	const t = $derived(strings[language.resolved]);
+
+	// After signing in, resume an invite if one was carried in the URL.
+	let invite = $derived($page.url.searchParams.get('invite'));
+	function dest() {
+		return invite ? `/join/${invite}` : '/';
+	}
+	let registerHref = $derived(
+		invite ? `/register?invite=${encodeURIComponent(invite)}` : '/register'
+	);
+
+	async function submit(e: Event) {
+		e.preventDefault();
+		error = '';
+		busy = true;
+		try {
+			await auth.login(identity, password);
+			goto(dest());
+		} catch {
+			error = t.auth.wrongCredentials;
+		} finally {
+			busy = false;
+		}
+	}
+
+	async function google() {
+		error = '';
+		busy = true;
+		try {
+			await auth.loginGoogle();
+			goto(dest());
+		} catch (e: unknown) {
+			error = (e as { message?: string })?.message ?? t.auth.googleFailed;
+		} finally {
+			busy = false;
+		}
+	}
+</script>
+
+<div class="auth">
+	<div class="brand-intro">
+		<Logo variant="hero" tagline={t.auth.tagline} />
+		<p class="muted brand-copy">{t.auth.subtitle}</p>
+	</div>
+
+	<form class="card" onsubmit={submit}>
+		<div class="field">
+			<label for="id">{t.auth.emailLabel}</label>
+			<input
+				id="id"
+				class="input"
+				type="email"
+				placeholder={t.auth.emailPlaceholder}
+				bind:value={identity}
+				autocomplete="email"
+				required
+			/>
+		</div>
+		<div class="field">
+			<div class="lblrow">
+				<label for="pw">{t.auth.passwordLabel}</label>
+				<a class="forgot" href="/forgot-password">{t.auth.forgotPassword}</a>
+			</div>
+			<input
+				id="pw"
+				class="input"
+				type="password"
+				bind:value={password}
+				autocomplete="current-password"
+				required
+			/>
+		</div>
+		{#if error}<p class="error">{error}</p>{/if}
+		<button class="btn" disabled={busy}>{busy ? `${t.auth.login}…` : t.auth.login}</button>
+		<div class="sep"><span>{t.auth.or}</span></div>
+		<button
+			type="button"
+			class="gsi"
+			disabled={busy}
+			onclick={google}
+			aria-label={t.auth.google}
+		>
+			<svg class="gsi-logo" viewBox="0 0 48 48" aria-hidden="true">
+				<path
+					fill="#EA4335"
+					d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+				/>
+				<path
+					fill="#4285F4"
+					d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+				/>
+				<path
+					fill="#FBBC05"
+					d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+				/>
+				<path
+					fill="#34A853"
+					d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+				/>
+			</svg>
+			<span class="gsi-text">{t.auth.google}</span>
+		</button>
+		<p class="muted switch">
+			{t.auth.newHere} <a href={registerHref}>{t.auth.createAccount}</a>
+		</p>
+	</form>
+</div>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+	.auth {
+		max-width: 420px;
+		margin: 8dvh auto 0;
+		padding: 0 0.2rem;
+	}
+	.brand-intro {
+		display: grid;
+		gap: 0.8rem;
+		margin-bottom: 1.25rem;
+	}
+	.brand-copy {
+		max-width: 34ch;
+		margin: 0;
+		font-size: 0.98rem;
+		line-height: 1.5;
+	}
+	@media (max-width: 520px) {
+		.auth {
+			margin-top: 5dvh;
+		}
+		.brand-intro {
+			gap: 0.7rem;
+			margin-bottom: 1rem;
+		}
+	}
+	.switch {
+		text-align: center;
+		margin: 1rem 0 0;
+	}
+	.lblrow {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+	.forgot {
+		font-size: 0.8rem;
+		color: var(--muted);
+	}
+	.forgot:hover {
+		color: var(--accent);
+	}
+	.sep {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0.9rem 0;
+		color: var(--muted);
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+	.sep::before,
+	.sep::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: var(--border);
+	}
+
+	/* Google "Sign in with Google" button — light theme, per Google's
+	   Identity branding guidelines. Colors, logo, font and capitalization
+	   must not be altered. https://developers.google.com/identity/branding-guidelines
+	   (Roboto is imported at the top of this stylesheet.) */
+	.gsi {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		width: 100%;
+		height: 40px;
+		padding: 0 12px;
+		background: #ffffff;
+		border: 1px solid #747775;
+		border-radius: 4px;
+		color: #1f1f1f;
+		font-family: 'Roboto', arial, sans-serif;
+		font-size: 14px;
+		font-weight: 500;
+		letter-spacing: 0.25px;
+		text-transform: none;
+		cursor: pointer;
+		transition: background-color 0.15s ease, border-color 0.15s ease;
+	}
+	.gsi:hover:not(:disabled) {
+		/* Google light-theme hover state layer: #303030 @ ~8% over white */
+		background: #f7f8f8;
+		border-color: #747775;
+		box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
+	}
+	.gsi:focus-visible {
+		outline: 2px solid #8ab4f8;
+		outline-offset: 2px;
+	}
+	.gsi:disabled {
+		opacity: 0.38;
+		cursor: default;
+	}
+	.gsi-logo {
+		width: 18px;
+		height: 18px;
+		flex: none;
+	}
+	.gsi-text {
+		line-height: 1;
+	}
+</style>

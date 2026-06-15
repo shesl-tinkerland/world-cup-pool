@@ -1,0 +1,123 @@
+import { pb } from './pb';
+import { readRuntimeLanguage } from './runtimeLanguage';
+
+function normalizeEmail(email: string) {
+	return email.trim().toLowerCase();
+}
+
+// Reactive auth state backed by PocketBase's authStore. Svelte 5 runes class;
+// a single shared instance is exported below.
+class Auth {
+	user = $state<{
+		id: string;
+		name: string;
+		email: string;
+		avatarUrl: string | null;
+	} | null>(null);
+
+	constructor() {
+		this.sync();
+		pb.authStore.onChange(() => this.sync());
+	}
+
+	private sync() {
+		const r = pb.authStore.record;
+		if (!pb.authStore.isValid || !r) {
+			this.user = null;
+			return;
+		}
+		// Avatar comes from the PocketBase file field; Google OAuth (added
+		// later) maps its avatar URL into this same field, so the UI needs
+		// no change when that lands.
+		const avatarUrl = r.avatar
+			? pb.files.getURL(r, r.avatar as string)
+			: null;
+		this.user = {
+			id: r.id,
+			name: (r.name as string) || r.email,
+			email: r.email,
+			avatarUrl
+		};
+	}
+
+	get isAuthed() {
+		return this.user !== null;
+	}
+
+	async login(identity: string, password: string) {
+		const normalizedIdentity = normalizeEmail(identity);
+		try {
+			await pb.collection('users').authWithPassword(identity.trim(), password);
+		} catch (err) {
+			if (identity.trim() === normalizedIdentity) throw err;
+			await pb.collection('users').authWithPassword(normalizedIdentity, password);
+		}
+		this.sync();
+	}
+
+	// Google OAuth2 (popup flow). Creates or signs into the matching account;
+	// the avatar/name are pulled from the Google profile by the server.
+	async loginGoogle() {
+		await pb.collection('users').authWithOAuth2({ provider: 'google' });
+		this.sync();
+	}
+
+	// Update the signed-in user's display name and (optionally) avatar.
+	// FormData carries the text field and the optional image in one request;
+	// authRefresh re-pulls the auth record so onChange → sync() propagates the
+	// change to the UserMenu and anywhere else reading auth.user.
+	async updateProfile(opts: { name: string; avatarFile?: File | null }) {
+		if (!this.user) throw new Error('Not signed in.');
+		const body = new FormData();
+		body.set('name', opts.name.trim());
+		if (opts.avatarFile) body.set('avatar', opts.avatarFile);
+		await pb.collection('users').update(this.user.id, body);
+		await pb.collection('users').authRefresh();
+	}
+
+	// Send a password reset email to the given address. PocketBase always
+	// returns true and never reveals whether the address exists, so we treat
+	// every non-thrown response as success.
+	async requestPasswordReset(email: string) {
+		await pb.collection('users').requestPasswordReset(normalizeEmail(email));
+	}
+
+	// Apply a reset token (from the emailed link) and set a new password.
+	// PocketBase invalidates the auth store on success, so callers should
+	// route the user to /login afterwards.
+	async confirmPasswordReset(
+		token: string,
+		password: string,
+		passwordConfirm: string
+	) {
+		await pb
+			.collection('users')
+			.confirmPasswordReset(token, password, passwordConfirm);
+	}
+
+	async register(name: string, email: string, password: string) {
+		const normalizedEmail = normalizeEmail(email);
+		await pb.collection('users').create({
+			name,
+			email: normalizedEmail,
+			language: readRuntimeLanguage(),
+			password,
+			passwordConfirm: password
+		});
+		await this.login(normalizedEmail, password);
+		this.sync();
+	}
+
+	async deleteAccount() {
+		if (!this.user) throw new Error('Not signed in.');
+		await pb.send('/api/account', { method: 'DELETE' });
+		pb.authStore.clear();
+		this.sync();
+	}
+
+	logout() {
+		pb.authStore.clear();
+	}
+}
+
+export const auth = new Auth();

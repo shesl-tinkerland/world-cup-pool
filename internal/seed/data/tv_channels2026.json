@@ -1,0 +1,626 @@
+[
+  {
+    "dato": "2026-06-11",
+    "tid": "12:00",
+    "kamp": "Mexico – Sør-Afrika",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-11",
+    "tid": "19:00",
+    "kamp": "Sør-Korea – Tsjekkia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-12",
+    "tid": "12:00",
+    "kamp": "Canada – Bosnia-Hercegovina",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-12",
+    "tid": "18:00",
+    "kamp": "USA – Paraguay",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-13",
+    "tid": "12:00",
+    "kamp": "Qatar – Sveits",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-13",
+    "tid": "15:00",
+    "kamp": "Brasil – Marokko",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-13",
+    "tid": "18:00",
+    "kamp": "Haiti – Skottland",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-13",
+    "tid": "21:00",
+    "kamp": "Australia – Tyrkia",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-14",
+    "tid": "10:00",
+    "kamp": "Tyskland – Curaçao",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-14",
+    "tid": "13:00",
+    "kamp": "Nederland – Japan",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-14",
+    "tid": "16:00",
+    "kamp": "Elfenbenskysten – Ecuador",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-14",
+    "tid": "19:00",
+    "kamp": "Sverige – Tunisia",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-15",
+    "tid": "09:00",
+    "kamp": "Spania – Kapp Verde",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-15",
+    "tid": "12:00",
+    "kamp": "Belgia – Egypt",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-15",
+    "tid": "15:00",
+    "kamp": "Saudi Arabia – Uruguay",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-15",
+    "tid": "18:00",
+    "kamp": "Iran – New Zealand",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-16",
+    "tid": "12:00",
+    "kamp": "Frankrike – Senegal",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-16",
+    "tid": "15:00",
+    "kamp": "Irak – Norge",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-16",
+    "tid": "18:00",
+    "kamp": "Argentina – Algerie",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-16",
+    "tid": "21:00",
+    "kamp": "Østerrike – Jordan",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-17",
+    "tid": "10:00",
+    "kamp": "Portugal – DR Kongo",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-17",
+    "tid": "13:00",
+    "kamp": "England – Kroatia",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-17",
+    "tid": "16:00",
+    "kamp": "Ghana – Panama",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-17",
+    "tid": "19:00",
+    "kamp": "Usbekistan – Colombia",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-18",
+    "tid": "09:00",
+    "kamp": "Tsjekkia – Sør-Afrika",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-18",
+    "tid": "12:00",
+    "kamp": "Sveits – Bosnia-Hercegovina",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-18",
+    "tid": "15:00",
+    "kamp": "Canada – Qatar",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-18",
+    "tid": "18:00",
+    "kamp": "Mexico – Sør-Korea",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-19",
+    "tid": "12:00",
+    "kamp": "USA – Australia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-19",
+    "tid": "15:00",
+    "kamp": "Skottland – Marokko",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-19",
+    "tid": "18:00",
+    "kamp": "Brasil – Haiti",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-19",
+    "tid": "21:00",
+    "kamp": "Tyrkia – Paraguay",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-20",
+    "tid": "10:00",
+    "kamp": "Nederland – Sverige",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-20",
+    "tid": "13:00",
+    "kamp": "Tyskland – Elfenbenskysten",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-20",
+    "tid": "17:00",
+    "kamp": "Ecuador – Curaçao",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-20",
+    "tid": "21:00",
+    "kamp": "Tunisia – Japan",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-21",
+    "tid": "09:00",
+    "kamp": "Spania – Saudi Arabia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-21",
+    "tid": "12:00",
+    "kamp": "Belgia – Iran",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-21",
+    "tid": "15:00",
+    "kamp": "Uruguay – Kapp Verde",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-21",
+    "tid": "18:00",
+    "kamp": "New Zealand – Egypt",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-22",
+    "tid": "12:00",
+    "kamp": "Norge – Senegal",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-22",
+    "tid": "15:00",
+    "kamp": "Frankrike – Irak",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-22",
+    "tid": "18:00",
+    "kamp": "Argentina – Jordan",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-22",
+    "tid": "21:00",
+    "kamp": "Østerrike – Algerie",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-23",
+    "tid": "10:00",
+    "kamp": "Portugal – Panama",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-23",
+    "tid": "13:00",
+    "kamp": "England – DR Kongo",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-23",
+    "tid": "16:00",
+    "kamp": "Colombia – Ghana",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-23",
+    "tid": "19:00",
+    "kamp": "Kroatia – Usbekistan",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-24",
+    "tid": "16:00",
+    "kamp": "Sør-Korea – Mexico",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-24",
+    "tid": "16:00",
+    "kamp": "Sør-Afrika – Tsjekkia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-24",
+    "tid": "21:00",
+    "kamp": "Canada – Sveits",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-24",
+    "tid": "21:00",
+    "kamp": "Qatar – Bosnia-Hercegovina",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-25",
+    "tid": "16:00",
+    "kamp": "USA – Tyrkia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-25",
+    "tid": "16:00",
+    "kamp": "Australia – Paraguay",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-25",
+    "tid": "21:00",
+    "kamp": "Brasil – Skottland",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-25",
+    "tid": "21:00",
+    "kamp": "Marokko – Haiti",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-26",
+    "tid": "16:00",
+    "kamp": "Tyskland – Nederland",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-26",
+    "tid": "16:00",
+    "kamp": "Sverige – Elfenbenskysten",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-26",
+    "tid": "21:00",
+    "kamp": "Ecuador – Japan",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-26",
+    "tid": "21:00",
+    "kamp": "Tunisia – Curaçao",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "16:00",
+    "kamp": "Spania – Belgia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "16:00",
+    "kamp": "Egypt – Kapp Verde",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Uruguay – New Zealand",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Iran – Saudi Arabia",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Frankrike – Norge",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Irak – Senegal",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Argentina – Østerrike",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Jordan – Algerie",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Portugal – England",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Kroatia – DR Kongo",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Usbekistan – Ghana",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Colombia – Panama",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-28",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1A – 3C/D/E",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-28",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 2B – 2F",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-29",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1C – 3A/B/F",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-29",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 1E – 2D",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-30",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1G – 3I/J/K",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-30",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 2H – 2L",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-01",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1I – 3G/H/L",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-01",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 1K – 2J",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-02",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1B – 3A/C/D",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-02",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 1F – 2C",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-03",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1D – 3B/E/F",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-03",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 2A – 2E",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-04",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1H – 3G/I/J",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-04",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 1L – 2I",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-05",
+    "tid": "18:00",
+    "kamp": "16-delsfinale: 1J – 3H/K/L",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-05",
+    "tid": "21:30",
+    "kamp": "16-delsfinale: 2G – 2K",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-06",
+    "tid": "18:00",
+    "kamp": "Åttedelsfinale 1",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-06",
+    "tid": "21:30",
+    "kamp": "Åttedelsfinale 2",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-07",
+    "tid": "18:00",
+    "kamp": "Åttedelsfinale 3",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-07",
+    "tid": "21:30",
+    "kamp": "Åttedelsfinale 4",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-08",
+    "tid": "18:00",
+    "kamp": "Åttedelsfinale 5",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-08",
+    "tid": "21:30",
+    "kamp": "Åttedelsfinale 6",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-09",
+    "tid": "18:00",
+    "kamp": "Åttedelsfinale 7",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-09",
+    "tid": "21:30",
+    "kamp": "Åttedelsfinale 8",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-11",
+    "tid": "18:00",
+    "kamp": "Kvartfinale 1",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-11",
+    "tid": "21:30",
+    "kamp": "Kvartfinale 2",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-12",
+    "tid": "18:00",
+    "kamp": "Kvartfinale 3",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-12",
+    "tid": "21:30",
+    "kamp": "Kvartfinale 4",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-15",
+    "tid": "21:30",
+    "kamp": "Semifinale 1",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-16",
+    "tid": "21:30",
+    "kamp": "Semifinale 2",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-07-18",
+    "tid": "21:30",
+    "kamp": "Bronsefinale",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-07-19",
+    "tid": "21:30",
+    "kamp": "VM-Finale",
+    "kanal": "NRK1"
+  }
+]

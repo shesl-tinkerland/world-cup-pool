@@ -1,0 +1,20 @@
+name: fhun_tips_test
+
+services:
+  app_test:
+    build: .
+    container_name: fhun_tips_test
+    image: wm-pickems:test
+    restart: unless-stopped
+    ports:
+      - "${TEST_HTTP_PORT:-8091}:8090"
+    env_file:
+      - .env
+    environment:
+      - WMP_DEV=${TEST_WMP_DEV:-1}
+      - RESULTS_SOURCE=${TEST_RESULTS_SOURCE:-openfootball}
+    volumes:
+      - pb_data_test:/pb_data
+
+volumes:
+  pb_data_test:

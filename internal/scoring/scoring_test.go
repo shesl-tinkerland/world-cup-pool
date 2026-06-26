@@ -1,6 +1,10 @@
 package scoring
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/pocketbase/pocketbase/core"
+)
 
 func defaultCfg() Config {
 	var c Config
@@ -111,6 +115,41 @@ func TestScoreValues(t *testing.T) {
 				t.Errorf("points %d exceeds the 6 max", r.points())
 			}
 		})
+	}
+}
+
+func scoringRecord(collectionName string) *core.Record {
+	collection := core.NewBaseCollection(collectionName)
+	collection.Fields.Add(&core.TextField{Name: "stage", Max: 16})
+	collection.Fields.Add(&core.TextField{Name: "homeTeam", Max: 32})
+	collection.Fields.Add(&core.TextField{Name: "awayTeam", Max: 32})
+	collection.Fields.Add(&core.TextField{Name: "advancer", Max: 32})
+	collection.Fields.Add(&core.NumberField{Name: "ftHome", OnlyInt: true})
+	collection.Fields.Add(&core.NumberField{Name: "ftAway", OnlyInt: true})
+	collection.Fields.Add(&core.NumberField{Name: "etHome", OnlyInt: true})
+	collection.Fields.Add(&core.NumberField{Name: "etAway", OnlyInt: true})
+	return core.NewRecord(collection)
+}
+
+func TestScoreTipGivesZeroForStaleKnockoutTip(t *testing.T) {
+	cfg := defaultCfg()
+	match := scoringRecord("matches")
+	match.Set("stage", "R32")
+	match.Set("homeTeam", "usa")
+	match.Set("awayTeam", "germany")
+	match.Set("advancer", "usa")
+	match.Set("ftHome", 2)
+	match.Set("ftAway", 1)
+
+	tip := scoringRecord("tips")
+	tip.Set("advancer", "bosnia")
+	tip.Set("ftHome", 2)
+	tip.Set("ftAway", 1)
+
+	got := scoreTip(cfg, match, tip)
+
+	if got.points() != 0 {
+		t.Fatalf("points = %d, want 0 for stale KO tip (%+v)", got.points(), got)
 	}
 }
 

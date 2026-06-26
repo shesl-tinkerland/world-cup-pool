@@ -86,4 +86,59 @@ describe('decisiveEvents', () => {
 		expect(out.length).toBe(1);
 		expect(out[0].detail).toBe('Red Card');
 	});
+
+	it('keeps only one red card per player (Canada 6:0 Qatar)', () => {
+		// Real data: Al Amin is shown sent off at 32' and again at 33'; Madibo gets a
+		// red 51', a second yellow 52', then a red 53' — each is one dismissal.
+		const raw: LiveEvent[] = [
+			ev({ elapsed: 32, type: 'Card', detail: 'Red Card', team: 'Qatar', player: 'H. Al Amin' }),
+			ev({ elapsed: 33, type: 'Card', detail: 'Red Card', team: 'Qatar', player: 'H. Al Amin' }),
+			ev({ elapsed: 51, type: 'Card', detail: 'Red Card', team: 'Qatar', player: 'A. O. Madibo' }),
+			ev({ elapsed: 52, type: 'Card', detail: 'Yellow Card', team: 'Qatar', player: 'A. O. Madibo' }),
+			ev({ elapsed: 53, type: 'Card', detail: 'Red Card', team: 'Qatar', player: 'A. O. Madibo' })
+		];
+
+		const reds = decisiveEvents(raw).filter((e) => e.detail === 'Red Card');
+		expect(reds.length).toBe(2);
+		expect(reds.filter((e) => e.player.includes('Al Amin')).length).toBe(1);
+		expect(reds.filter((e) => e.player.includes('Madibo')).length).toBe(1);
+	});
+
+	it('trims a goal doubled across half-time when the score is known (Canada 6:0)', () => {
+		// "J. David" 45+3' and "Jonathan David" 48' are the same goal across the break;
+		// same-minute dedup can't see it, but the 6:0 score reveals the phantom.
+		const raw: LiveEvent[] = [
+			ev({ elapsed: 16, team: 'Canada', player: 'C. Larin' }),
+			ev({ elapsed: 29, team: 'Canada', player: 'J. David' }),
+			ev({ elapsed: 45, extra: 3, team: 'Canada', player: 'J. David' }),
+			ev({ elapsed: 48, team: 'Canada', player: 'Jonathan David' }),
+			ev({ elapsed: 64, team: 'Canada', player: 'N. Saliba' }),
+			ev({ elapsed: 75, team: 'Canada', player: '' }),
+			ev({ elapsed: 75, team: 'Canada', player: 'M. Al Mannai', detail: 'Own Goal' }),
+			ev({ elapsed: 90, extra: 2, team: 'Canada', player: 'J. David' }),
+			ev({ elapsed: 90, extra: 2, team: 'Canada', player: 'J. David' })
+		];
+
+		// Same-minute dedup alone still leaves 7 goals for a 6:0 match.
+		expect(decisiveEvents(raw).length).toBe(7);
+
+		const out = decisiveEvents(raw, 6);
+		expect(out.length).toBe(6);
+		// The 45+3' duplicate is dropped; the fuller "Jonathan David" 48' is kept.
+		expect(out.some((e) => e.elapsed === 45 && e.extra === 3)).toBe(false);
+		expect(out.some((e) => e.elapsed === 48 && e.player === 'Jonathan David')).toBe(true);
+		// Real David goals at 29' and 90+2' survive.
+		expect(out.some((e) => e.elapsed === 29)).toBe(true);
+		expect(out.some((e) => e.elapsed === 90 && e.extra === 2)).toBe(true);
+	});
+
+	it('never trims a real same-player brace when the count already matches', () => {
+		// Balogun scores at 45+5' and 50' — distinct goals. A correct score must not
+		// merge them.
+		const raw: LiveEvent[] = [
+			ev({ elapsed: 45, extra: 5, team: 'USA', player: 'F. Balogun' }),
+			ev({ elapsed: 50, team: 'USA', player: 'Folarin Balogun' })
+		];
+		expect(decisiveEvents(raw, 2).length).toBe(2);
+	});
 });

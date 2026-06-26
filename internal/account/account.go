@@ -5,6 +5,8 @@ import (
 
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
+
+	"github.com/oyvhov/world-cup-pool/internal/tips"
 )
 
 const globalInviteCode = "GLOBAL"
@@ -25,6 +27,11 @@ func Register(app core.App, se *core.ServeEvent) {
 	// Deletes the current user after first removing any private leagues they
 	// own so required owner relations don't block the account deletion.
 	g.DELETE("", func(e *core.RequestEvent) error {
+		// Deleting the user cascades away their tips, including tips on locked
+		// matches; bypass the tips lock hook so the cascade isn't blocked.
+		tips.SetBypass(true)
+		defer tips.SetBypass(false)
+
 		ownedLeagues, err := app.FindRecordsByFilter(
 			"leagues",
 			"owner = {:u}",

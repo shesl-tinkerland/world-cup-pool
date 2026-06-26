@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
@@ -46,6 +47,18 @@ func main() {
 	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
 		if err := seed.Run(e.App); err != nil {
 			return err
+		}
+
+		if publicURL := strings.TrimRight(strings.TrimSpace(os.Getenv("PUBLIC_APP_URL")), "/"); publicURL != "" {
+			settings := e.App.Settings()
+			if strings.TrimRight(settings.Meta.AppURL, "/") != publicURL {
+				settings.Meta.AppURL = publicURL
+				if err := e.App.Save(settings); err != nil {
+					log.Printf("[boot] failed to sync Settings -> Application URL from PUBLIC_APP_URL: %v", err)
+				} else {
+					log.Printf("[boot] synced Settings -> Application URL from PUBLIC_APP_URL")
+				}
+			}
 		}
 
 		// If PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD are provided in ENV, upsert the superuser

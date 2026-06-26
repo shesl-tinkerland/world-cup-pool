@@ -129,8 +129,12 @@ func Register(app core.App, se *core.ServeEvent) {
 		return e.Next()
 	})
 	app.OnRecordDelete("tips").BindFunc(func(e *core.RecordEvent) error {
-		if m, err := e.App.FindRecordById("matches", e.Record.GetString("match")); err == nil && locked(e.App, m) {
-			return apis.NewBadRequestError("this match is locked", nil)
+		// bypass lets account deletion cascade away a user's tips even on locked
+		// matches; otherwise this lock only stops a user deleting a tip post-kickoff.
+		if !bypass.Load() {
+			if m, err := e.App.FindRecordById("matches", e.Record.GetString("match")); err == nil && locked(e.App, m) {
+				return apis.NewBadRequestError("this match is locked", nil)
+			}
 		}
 		return e.Next()
 	})
@@ -207,6 +211,7 @@ func Register(app core.App, se *core.ServeEvent) {
 				"userId":    uid,
 				"name":      u.GetString("name"),
 				"isMe":      isMe,
+				"hasTip":    true,
 				"ftHome":    t.GetInt("ftHome"),
 				"ftAway":    t.GetInt("ftAway"),
 				"etHome":    t.GetInt("etHome"),

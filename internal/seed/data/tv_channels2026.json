@@ -243,13 +243,13 @@
     "dato": "2026-06-22",
     "tid": "12:00",
     "kamp": "Norge – Senegal",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-22",
     "tid": "15:00",
     "kamp": "Frankrike – Irak",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-22",
@@ -266,50 +266,50 @@
   {
     "dato": "2026-06-23",
     "tid": "10:00",
-    "kamp": "Portugal – Panama",
-    "kanal": "NRK1"
-  },
-  {
-    "dato": "2026-06-23",
-    "tid": "13:00",
-    "kamp": "England – DR Kongo",
+    "kamp": "Portugal – Usbekistan",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-23",
+    "tid": "13:00",
+    "kamp": "England – Ghana",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-23",
     "tid": "16:00",
-    "kamp": "Colombia – Ghana",
+    "kamp": "Colombia – DR Kongo",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-23",
     "tid": "19:00",
-    "kamp": "Kroatia – Usbekistan",
+    "kamp": "Panama – Kroatia",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-24",
+    "tid": "16:00",
+    "kamp": "Mexico – Tsjekkia",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-24",
     "tid": "16:00",
-    "kamp": "Sør-Korea – Mexico",
-    "kanal": "NRK1"
-  },
-  {
-    "dato": "2026-06-24",
-    "tid": "16:00",
-    "kamp": "Sør-Afrika – Tsjekkia",
-    "kanal": "NRK1"
+    "kamp": "Sør-Afrika – Sør-Korea",
+    "kanal": "TV2"
   },
   {
     "dato": "2026-06-24",
     "tid": "21:00",
     "kamp": "Canada – Sveits",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-24",
     "tid": "21:00",
     "kamp": "Qatar – Bosnia-Hercegovina",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-25",
@@ -327,109 +327,109 @@
     "dato": "2026-06-25",
     "tid": "21:00",
     "kamp": "Brasil – Skottland",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-25",
     "tid": "21:00",
     "kamp": "Marokko – Haiti",
-    "kanal": "TV2"
-  },
-  {
-    "dato": "2026-06-26",
-    "tid": "16:00",
-    "kamp": "Tyskland – Nederland",
     "kanal": "NRK1"
   },
   {
     "dato": "2026-06-26",
     "tid": "16:00",
-    "kamp": "Sverige – Elfenbenskysten",
-    "kanal": "NRK1"
+    "kamp": "Ecuador – Tyskland",
+    "kanal": "TV2"
   },
   {
     "dato": "2026-06-26",
-    "tid": "21:00",
-    "kamp": "Ecuador – Japan",
+    "tid": "16:00",
+    "kamp": "Curaçao – Elfenbenskysten",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-26",
     "tid": "21:00",
-    "kamp": "Tunisia – Curaçao",
+    "kamp": "Tunisia – Nederland",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-26",
+    "tid": "21:00",
+    "kamp": "Japan – Sverige",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-27",
     "tid": "16:00",
-    "kamp": "Spania – Belgia",
+    "kamp": "Uruguay – Spania",
     "kanal": "NRK1"
   },
   {
     "dato": "2026-06-27",
     "tid": "16:00",
-    "kamp": "Egypt – Kapp Verde",
+    "kamp": "Kapp Verde – Saudi Arabia",
     "kanal": "NRK1"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
-    "kamp": "Uruguay – New Zealand",
+    "kamp": "Egypt – Iran",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
-    "kamp": "Iran – Saudi Arabia",
+    "kamp": "New Zealand – Belgia",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
     "kamp": "Frankrike – Norge",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
     "kamp": "Irak – Senegal",
-    "kanal": "TV2"
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
     "kamp": "Argentina – Østerrike",
-    "kanal": "NRK1"
+    "kanal": "TV2"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
     "kamp": "Jordan – Algerie",
-    "kanal": "NRK1"
-  },
-  {
-    "dato": "2026-06-27",
-    "tid": "21:00",
-    "kamp": "Portugal – England",
-    "kanal": "NRK1"
-  },
-  {
-    "dato": "2026-06-27",
-    "tid": "21:00",
-    "kamp": "Kroatia – DR Kongo",
-    "kanal": "NRK1"
-  },
-  {
-    "dato": "2026-06-27",
-    "tid": "21:00",
-    "kamp": "Usbekistan – Ghana",
     "kanal": "TV2"
   },
   {
     "dato": "2026-06-27",
     "tid": "21:00",
-    "kamp": "Colombia – Panama",
+    "kamp": "Panama – England",
     "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Kroatia – Ghana",
+    "kanal": "TV2"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "DR Kongo – Usbekistan",
+    "kanal": "NRK1"
+  },
+  {
+    "dato": "2026-06-27",
+    "tid": "21:00",
+    "kamp": "Colombia – Portugal",
+    "kanal": "NRK1"
   },
   {
     "dato": "2026-06-28",

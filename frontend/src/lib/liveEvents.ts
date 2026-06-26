@@ -44,18 +44,43 @@ function goalMoment(event: LiveEvent): string {
 	return `${event.team}|${event.elapsed}|${event.extra}`;
 }
 
-// decisiveEvents filters to goals + red cards AND cleans up two provider quirks:
+// A player's identity for dedup: first initial + last name token, lowercased.
+// Collapses the feed's name backfill ("J. David" -> "Jonathan David") to one key
+// while keeping different players apart.
+function playerKey(player: string): string {
+	const tokens = player.trim().toLowerCase().split(/\s+/).filter(Boolean);
+	if (tokens.length === 0) return '';
+	const initial = tokens[0][0] ?? '';
+	const last = tokens[tokens.length - 1].replace(/[^a-z0-9]/g, '');
+	return `${initial}|${last}`;
+}
+
+function effMinute(event: LiveEvent): number {
+	return event.elapsed + event.extra;
+}
+
+// decisiveEvents filters to goals + red cards AND cleans up provider quirks:
 //
 //  1. VAR cancellations. When a goal is disallowed, API-Football keeps the
 //     original goal row as "Normal Goal" and files the reversal as a *separate*
 //     VAR event ("Goal Disallowed - offside"). We collect those and drop the
 //     orphaned goal, so a chalked-off goal doesn't inflate the score.
 //
-//  2. Duplicates. The same goal often arrives several times as the feed backfills
-//     the assist or corrects the scorer's name/id (e.g. "F. Balogun" then "Folarin
-//     Balogun" at 31'). We collapse by (type, moment) and keep the richest variant
-//     — fullest name, with assist — so late corrections win.
-export function decisiveEvents(events: LiveEvent[]): LiveEvent[] {
+//  2. Same-minute duplicates. The same goal often arrives several times as the
+//     feed backfills the assist or corrects the scorer's name/id (e.g.
+//     "F. Balogun" then "Folarin Balogun" at 31'). We collapse by (type, moment)
+//     and keep the richest variant — fullest name, with assist.
+//
+//  3. Red-card duplicates. A player can only be sent off once, yet the feed files
+//     the dismissal twice (a minute apart, or a second-yellow as a separate red).
+//     We keep one red card per team+player.
+//
+//  4. Goal over-count. When the real score is known, a goal doubled across the
+//     half-time boundary with a name backfill ("J. David" 45+3' then "Jonathan
+//     David" 48') survives same-minute dedup. If more goals show than were
+//     actually scored, we trim the closest same-player pair — never a real brace,
+//     since a correct count is left untouched.
+export function decisiveEvents(events: LiveEvent[], expectedGoals?: number): LiveEvent[] {
 	const cancelledGoals = new Set<string>();
 	for (const event of events) {
 		if (event.type === 'Var' && /disallow|cancel/i.test(event.detail)) {
@@ -71,7 +96,55 @@ export function decisiveEvents(events: LiveEvent[]): LiveEvent[] {
 		const current = byMoment.get(key);
 		if (!current || richer(event, current)) byMoment.set(key, event);
 	}
-	return [...byMoment.values()].sort((a, b) => a.elapsed - b.elapsed || a.extra - b.extra);
+
+	let result = [...byMoment.values()];
+
+	// (3) One red card per player.
+	const redSeen = new Set<string>();
+	result = result.filter((event) => {
+		if (!isRedCard(event)) return true;
+		const key = `${event.teamId || event.team}|${playerKey(event.player)}`;
+		if (redSeen.has(key)) return false;
+		redSeen.add(key);
+		return true;
+	});
+
+	// (4) Reconcile goal count to the real score when known.
+	if (expectedGoals !== undefined && Number.isFinite(expectedGoals)) {
+		result = reconcileGoalCount(result, expectedGoals);
+	}
+
+	return result.sort((a, b) => a.elapsed - b.elapsed || a.extra - b.extra);
+}
+
+// reconcileGoalCount drops phantom goals when the deduped list shows more than
+// were actually scored. It only ever removes a member of a same-player pair, the
+// closest in time first, so a correct count (excess <= 0) is returned untouched.
+function reconcileGoalCount(events: LiveEvent[], expectedGoals: number): LiveEvent[] {
+	const goals = events.filter(isGoal);
+	let excess = goals.length - expectedGoals;
+	if (excess <= 0) return events;
+
+	const sorted = [...goals].sort((a, b) => effMinute(a) - effMinute(b));
+	const pairs: { a: LiveEvent; b: LiveEvent; gap: number }[] = [];
+	for (let i = 0; i + 1 < sorted.length; i++) {
+		const a = sorted[i];
+		const b = sorted[i + 1];
+		const key = playerKey(a.player);
+		if (key && key === playerKey(b.player)) {
+			pairs.push({ a, b, gap: effMinute(b) - effMinute(a) });
+		}
+	}
+	pairs.sort((x, y) => x.gap - y.gap);
+
+	const drop = new Set<LiveEvent>();
+	for (const pair of pairs) {
+		if (excess <= 0) break;
+		if (drop.has(pair.a) || drop.has(pair.b)) continue;
+		drop.add(richer(pair.a, pair.b) ? pair.b : pair.a);
+		excess--;
+	}
+	return events.filter((event) => !drop.has(event));
 }
 
 function richer(candidate: LiveEvent, current: LiveEvent): boolean {

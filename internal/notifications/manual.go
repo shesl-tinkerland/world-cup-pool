@@ -39,7 +39,18 @@ func SendPreKickoffReminderToIncomplete(app core.App) (manualSendSummary, error)
 
 		email := strings.TrimSpace(u.GetString("email"))
 		dedup := EventPreKickoffReminder + ":" + year + ":" + u.Id
-		if email == "" || alreadySent(app, dedup, ChannelEmail) {
+		if email == "" {
+			summary.AlreadySent++
+			continue
+		}
+
+		claim, claimed, err := claimSend(app, u.Id, email, EventPreKickoffReminder, ChannelEmail, dedup)
+		if err != nil {
+			summary.Failed++
+			log.Printf("[notifications] manual pre-kickoff claim for %s failed: %v", email, err)
+			continue
+		}
+		if !claimed {
 			summary.AlreadySent++
 			continue
 		}
@@ -48,14 +59,22 @@ func SendPreKickoffReminderToIncomplete(app core.App) (manualSendSummary, error)
 		if err != nil {
 			summary.Failed++
 			log.Printf("[notifications] manual pre-kickoff render for %s failed: %v", email, err)
+			if ferr := finalizeSend(app, claim, false, err.Error()); ferr != nil {
+				log.Printf("[notifications] manual pre-kickoff finalize(failed) for %s failed: %v", email, ferr)
+			}
 			continue
 		}
 		if err := sendEmail(app, email, out.Subject, out.HTML); err != nil {
 			summary.Failed++
 			log.Printf("[notifications] manual pre-kickoff send to %s failed: %v", email, err)
+			if ferr := finalizeSend(app, claim, false, err.Error()); ferr != nil {
+				log.Printf("[notifications] manual pre-kickoff finalize(failed) for %s failed: %v", email, ferr)
+			}
 			continue
 		}
-		_ = recordSend(app, u.Id, email, EventPreKickoffReminder, ChannelEmail, dedup, statusSent, "")
+		if err := finalizeSend(app, claim, true, ""); err != nil {
+			log.Printf("[notifications] manual pre-kickoff finalize(sent) for %s failed: %v", email, err)
+		}
 		summary.Sent++
 		log.Printf("[notifications] manual pre-kickoff email sent to %s", email)
 	}

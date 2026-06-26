@@ -8,6 +8,8 @@
 	import { tipsStore } from '$lib/tips.svelte';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import LeagueChatCard from '$lib/components/LeagueChatCard.svelte';
+	import LeagueMatches from '$lib/components/LeagueMatches.svelte';
+	import { featureBanner } from '$lib/featureBanner.svelte';
 	import {
 		Eye,
 		EyeOff,
@@ -75,6 +77,7 @@
 	let loaded = $state(false);
 	let error = $state('');
 	let tab = $state<'total' | 'tipsPoints' | 'forecastPoints'>('total');
+	let view = $state<'standings' | 'matches'>('standings');
 	let deleteConfirm = $state('');
 	let deleteBusy = $state(false);
 	let deleteError = $state('');
@@ -239,12 +242,19 @@
 		[...rows].sort((a, b) => b[tab] - a[tab])
 	);
 	let fcView = $derived(tab === 'forecastPoints');
+	let avatarByUser = $derived(
+		Object.fromEntries(rows.map((r) => [r.userId, r.avatarUrl ?? '']))
+	);
 	let compactLeaderboard = $state(false);
 	const leaderboardPreviewRows = 25;
 	let leaderboardScrollable = $derived(rows.length > leaderboardPreviewRows);
 	let leaderboardColspan = $derived(compactLeaderboard ? 3 : fcView ? 12 : 8);
 
 	onMount(() => {
+		if ($page.url.searchParams.get('view') === 'matches') {
+			view = 'matches';
+			featureBanner.dismiss();
+		}
 		const media = window.matchMedia('(max-width: 759px)');
 		const syncCompactLeaderboard = () => {
 			compactLeaderboard = media.matches;
@@ -535,12 +545,39 @@
 		</section>
 	{/if}
 
+	{#if featureBanner.visible}
+		<div class="feature-banner">
+			<span class="fb-badge">{language.text('Nytt', 'Nytt', 'New')}</span>
+			<div class="fb-text">
+				<b>{language.text('Se kampene i ligaen', 'Sjå kampane i ligaen', 'See the league matches')}</b>
+				<span class="muted small">{language.text('Kamp for kamp: hva alle tippet og hvem som fikk poeng.', 'Kamp for kamp: kva alle tippa og kven som fekk poeng.', 'Match by match: what everyone tipped and who scored points.')}</span>
+			</div>
+			<button class="fb-cta" onclick={() => { view = 'matches'; featureBanner.dismiss(); }}>{language.text('Se kampene', 'Sjå kampane', 'See matches')}</button>
+			<button class="fb-x" onclick={() => featureBanner.dismiss()} aria-label={language.text('Lukk', 'Lukk', 'Dismiss')}><X size={16} /></button>
+		</div>
+	{/if}
+
 	<section class="card">
 		<div class="tabs">
-			<button class:active={tab === 'total'} onclick={() => (tab = 'total')}>{language.text('Totalt', 'Totalt', 'Total')}</button>
-			<button class:active={tab === 'tipsPoints'} onclick={() => (tab = 'tipsPoints')}>{language.text('Kamptips', 'Kamptips', 'Match tips')}</button>
-			<button class:active={tab === 'forecastPoints'} onclick={() => (tab = 'forecastPoints')}>{language.text('VM-tips', 'VM-tips', 'World Cup tips')}</button>
+			<button class:active={view === 'standings' && tab === 'total'} onclick={() => { view = 'standings'; tab = 'total'; }}>
+				<span class="t-full">{language.text('Totalt', 'Totalt', 'Total')}</span>
+				<span class="t-short">{language.text('Sum', 'Sum', 'Sum')}</span>
+			</button>
+			<button class:active={view === 'standings' && tab === 'tipsPoints'} onclick={() => { view = 'standings'; tab = 'tipsPoints'; }}>
+				<span class="t-full">{language.text('Kamptips', 'Kamptips', 'Match tips')}</span>
+				<span class="t-short">{language.text('Tips', 'Tips', 'Tips')}</span>
+			</button>
+			<button class:active={view === 'standings' && tab === 'forecastPoints'} onclick={() => { view = 'standings'; tab = 'forecastPoints'; }}>
+				<span class="t-full">{language.text('VM-tips', 'VM-tips', 'World Cup tips')}</span>
+				<span class="t-short">{language.text('VM', 'VM', 'WC')}</span>
+			</button>
+			<button class="kampar-tab" class:active={view === 'matches'} onclick={() => { view = 'matches'; featureBanner.dismiss(); }}>
+				{language.text('Kamper', 'Kampar', 'Matches')}
+				{#if featureBanner.visible}<span class="new-dot" aria-hidden="true"></span>{/if}
+			</button>
 		</div>
+
+		{#if view === 'standings'}
 
 		{#if leaderboardScrollable}
 			<p class="muted small lb-hint">
@@ -730,7 +767,12 @@
 				</table>
 			</div>
 		{/if}
+		{/if}
 	</section>
+
+	{#if view === 'matches'}
+		<LeagueMatches leagueId={league.id} avatars={avatarByUser} />
+	{/if}
 
 	{#if invite && invite !== 'GLOBAL'}
 		<LeagueChatCard leagueId={league.id} />
@@ -1179,6 +1221,108 @@
 		color: var(--bg);
 		background: var(--text);
 		border-color: var(--text);
+	}
+	.tabs .t-short {
+		display: none;
+	}
+	@media (max-width: 600px) {
+		.tabs {
+			gap: 0.3rem;
+		}
+		.tabs button {
+			padding: 0.5rem 0.2rem;
+			font-size: 0.82rem;
+		}
+		.tabs .t-full {
+			display: none;
+		}
+		.tabs .t-short {
+			display: inline;
+		}
+	}
+	/* Reclaim horizontal space on mobile — the standings table and content are
+	   width-hungry, so trim the card's generous padding on small screens. */
+	@media (max-width: 640px) {
+		.card {
+			padding: 0.85rem;
+		}
+	}
+	.kampar-tab {
+		position: relative;
+	}
+	.new-dot {
+		position: absolute;
+		top: 5px;
+		right: 7px;
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--live);
+		box-shadow: 0 0 0 2px var(--surface-2);
+	}
+	.feature-banner {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		padding: 0.7rem 0.85rem;
+		margin-bottom: 0.85rem;
+		background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+		border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+		border-radius: var(--radius-sm);
+	}
+	.fb-badge {
+		flex: none;
+		font-size: 0.66rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--accent-fg);
+		background: var(--accent);
+		padding: 0.2rem 0.5rem;
+		border-radius: var(--radius-pill);
+	}
+	.fb-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+		flex: 1;
+	}
+	.fb-text b {
+		font-weight: 700;
+		font-size: 0.92rem;
+	}
+	.fb-cta {
+		flex: none;
+		background: var(--text);
+		color: var(--bg);
+		border: none;
+		border-radius: var(--radius-pill);
+		font-weight: 700;
+		font-size: 0.8rem;
+		padding: 0.45rem 0.9rem;
+		cursor: pointer;
+	}
+	.fb-x {
+		flex: none;
+		background: none;
+		border: none;
+		color: var(--muted);
+		cursor: pointer;
+		display: inline-flex;
+		padding: 0.2rem;
+	}
+	.fb-x:hover {
+		color: var(--text);
+	}
+	@media (max-width: 560px) {
+		.feature-banner {
+			flex-wrap: wrap;
+		}
+		.fb-text {
+			flex-basis: 100%;
+			order: 3;
+		}
 	}
 	.lb-hint {
 		margin: -0.2rem 0 0.55rem;

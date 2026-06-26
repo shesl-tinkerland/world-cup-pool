@@ -74,13 +74,14 @@ export interface FriendTip {
 	userId: string;
 	name: string;
 	isMe: boolean;
+	hasTip?: boolean;
 	ftHome: number;
 	ftAway: number;
 	etHome: number;
 	etAway: number;
 	penWinner: string;
 	advancer: string;
-	points: number; // -1 = no tip submitted
+	points: number; // -1 = points not available yet, or no tip when hasTip=false
 }
 
 class TipsStore {
@@ -97,6 +98,7 @@ class TipsStore {
 	scoreRevision = $state(0);
 	private loadPromise: Promise<void> | null = null;
 	private _matchUnsub: (() => void) | null = null;
+	private _tipUnsub: (() => void) | null = null;
 	private _eventUnsub: (() => void) | null = null;
 	private _matchScoreUnsub: (() => void) | null = null;
 	private _forecastScoreUnsub: (() => void) | null = null;
@@ -299,6 +301,24 @@ class TipsStore {
 			this.queueMatchUpdate(match);
 		});
 
+		try {
+			this._tipUnsub = await pb.collection('tips').subscribe('*', (data) => {
+				const record = data.record as Record<string, unknown>;
+				const owner = stringField(record.user);
+				if (owner && owner !== auth.user?.id) return;
+				const tip = this.toTip(record);
+				if (!tip) return;
+				if (data.action === 'delete') {
+					this.removeTip(tip);
+				} else {
+					this.upsertTip(tip);
+				}
+				this.scheduleScoreRefresh();
+			});
+		} catch {
+			// Older deployed backends may not expose tips realtime.
+		}
+
 		// Seed liveMatchIds from current matches state.
 		this.liveMatchIds = new Set(this.matches.filter((m) => isLiveStatus(m.status)).map((m) => m.id));
 
@@ -343,6 +363,10 @@ class TipsStore {
 		if (this._matchUnsub) {
 			this._matchUnsub();
 			this._matchUnsub = null;
+		}
+		if (this._tipUnsub) {
+			this._tipUnsub();
+			this._tipUnsub = null;
 		}
 		if (this._eventUnsub) {
 			this._eventUnsub();
@@ -435,6 +459,43 @@ class TipsStore {
 			teamId: stringField(record.teamId),
 			comments: stringField(record.comments)
 		};
+	}
+
+	private toTip(record: Record<string, unknown>): Tip | null {
+		const match = stringField(record.match);
+		if (!match) return null;
+		return {
+			id: stringField(record.id),
+			match,
+			ftHome: numberField(record.ftHome),
+			ftAway: numberField(record.ftAway),
+			etHome: numberField(record.etHome),
+			etAway: numberField(record.etAway),
+			penWinner: stringField(record.penWinner),
+			advancer: stringField(record.advancer)
+		};
+	}
+
+	private upsertTip(tip: Tip) {
+		this.tips = {
+			...this.tips,
+			[tip.match]: tip
+		};
+	}
+
+	private removeTip(tip: Tip) {
+		const next = { ...this.tips };
+		if (next[tip.match]?.id === tip.id || !tip.id) {
+			delete next[tip.match];
+		} else {
+			for (const [matchId, existing] of Object.entries(next)) {
+				if (existing.id === tip.id) {
+					delete next[matchId];
+					break;
+				}
+			}
+		}
+		this.tips = next;
 	}
 
 	private upsertLiveEvent(event: LiveEvent) {

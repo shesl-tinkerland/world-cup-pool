@@ -164,6 +164,14 @@ func scoreValues(cfg Config, m MatchResult, p TipPrediction) tipComponents {
 }
 
 func scoreTip(cfg Config, match, tip *core.Record) tipComponents {
+	if match.GetString("stage") != "group" {
+		home := match.GetString("homeTeam")
+		away := match.GetString("awayTeam")
+		advancer := tip.GetString("advancer")
+		if home == "" || away == "" || (advancer != home && advancer != away) {
+			return tipComponents{}
+		}
+	}
 	return scoreValues(cfg,
 		MatchResult{
 			Stage:    match.GetString("stage"),

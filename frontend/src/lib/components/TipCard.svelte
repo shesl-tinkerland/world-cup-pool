@@ -50,7 +50,10 @@
 	let fetchedEvents = $state<LiveEvent[]>([]);
 	let eventsLoaded = $state(false);
 	let summaryEvents = $derived(
-		decisiveEvents(live ? (tipsStore.liveEvents[match.id] ?? []) : fetchedEvents)
+		decisiveEvents(
+			live ? (tipsStore.liveEvents[match.id] ?? []) : fetchedEvents,
+			match.etHome || match.etAway ? match.etHome + match.etAway : match.ftHome + match.ftAway
+		)
 	);
 
 	async function ensureMatchEvents() {

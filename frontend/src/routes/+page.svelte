@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { tick, untrack } from 'svelte';
+	import { tick } from 'svelte';
 	import { auth } from '$lib/auth.svelte';
 	import { homeIntro } from '$lib/homeIntro.svelte';
+	import { featureBanner } from '$lib/featureBanner.svelte';
+	import LeagueMatchCard from '$lib/components/LeagueMatchCard.svelte';
 	import { api, type ChatOverviewItem, type LeagueProgress, type LeagueSummary, type LeaderboardRow } from '$lib/api';
 	import { searchNav } from '$lib/searchNav.svelte';
-	import { tipsStore, type Match, type LiveEvent, isLiveStatus, isLocked, teamsResolved } from '$lib/tips.svelte';
-	import { decisiveEvents, eventIcon, eventMinute, eventTeam, eventTitle } from '$lib/liveEvents';
+	import { tipsStore, type Match, isLiveStatus, isLocked, teamsResolved } from '$lib/tips.svelte';
 	import { forecastStore as fs, koKey } from '$lib/forecast.svelte';
 	import { serverClock } from '$lib/serverclock.svelte';
 	import { teamDisplayName } from '$lib/teamNames';
@@ -338,6 +339,9 @@
 					new Date(b.kickoff).getTime() - new Date(a.kickoff).getTime()
 			)
 			.slice(0, 3)
+	);
+	let homeAvatars = $derived(
+		Object.fromEntries(lb.map((r) => [r.userId, r.avatarUrl ?? '']))
 	);
 	let activeLeagueRow = $derived(
 		lb.find((r) => r.userId === auth.user?.id) ?? null
@@ -961,76 +965,6 @@
 		return topLeagues;
 	});
 
-	// ----- Live scoreboard feel -------------------------------------------
-	function latestLiveEvent(m: Match): LiveEvent | null {
-		const events = tipsStore.liveEvents[m.id] ?? [];
-		if (events.length === 0) return null;
-		return events.reduce((best, ev) =>
-			ev.elapsed > best.elapsed || (ev.elapsed === best.elapsed && ev.extra > best.extra)
-				? ev
-				: best
-		);
-	}
-	function formatLiveMinute(minute: number, status: string): string {
-		if (status === '1H' || status === 'LIVE' || status === 'live') {
-			return minute > 45 ? `45+${minute - 45}'` : `${minute}'`;
-		}
-		if (status === '2H') return minute > 90 ? `90+${minute - 90}'` : `${minute}'`;
-		return `${minute}'`;
-	}
-
-	function estimatedLiveMinuteLabel(m: Match, latest: LiveEvent): string | null {
-		const created = new Date(latest.created).getTime();
-		if (!Number.isFinite(created)) return null;
-		const minutesSinceEvent = Math.max(0, Math.floor((now - created) / 60_000));
-		const currentMinute = Math.max(1, latest.elapsed + latest.extra + minutesSinceEvent);
-		return formatLiveMinute(currentMinute, m.status);
-	}
-
-	function liveMinuteLabel(m: Match): string {
-		if (m.status === 'HT') return language.text('Pause', 'Pause', 'HT');
-		const latest = latestLiveEvent(m);
-		if (latest) {
-			const estimated = estimatedLiveMinuteLabel(m, latest);
-			if (estimated) return estimated;
-			return latest.extra > 0 ? `${latest.elapsed}+${latest.extra}'` : `${latest.elapsed}'`;
-		}
-		if (m.status === '1H' || m.status === 'LIVE' || m.status === 'live')
-			return language.text('1. omg', '1. omg', '1st');
-		if (m.status === '2H') return language.text('2. omg', '2. omg', '2nd');
-		if (m.status === 'ET' || m.status === 'BT') return language.text('E.o.', 'E.o.', 'ET');
-		if (m.status === 'P') return language.text('Straffer', 'Straffer', 'Pens');
-		return '';
-	}
-
-	// Briefly flash a live match's score when it gains a new goal. Counts are seeded on
-	// first sight so existing goals do not flash on mount.
-	let goalFlash = $state<Record<string, number>>({});
-	const seenGoalCounts = new Map<string, number>();
-	$effect(() => {
-		const events = tipsStore.liveEvents; // track realtime goal stream
-		const liveIds = liveMatches.map((m) => m.id); // track which matches are live
-		const timers: ReturnType<typeof setTimeout>[] = [];
-		untrack(() => {
-			for (const id of liveIds) {
-				const goals = (events[id] ?? []).filter((ev) => ev.type === 'Goal').length;
-				const prev = seenGoalCounts.get(id);
-				seenGoalCounts.set(id, goals);
-				if (prev === undefined || goals <= prev) continue;
-				const token = Date.now();
-				goalFlash[id] = token;
-				const t = setTimeout(() => {
-					if (goalFlash[id] === token) delete goalFlash[id];
-				}, 1100);
-				timers.push(t);
-			}
-			for (const id of [...seenGoalCounts.keys()]) {
-				if (!liveIds.includes(id)) seenGoalCounts.delete(id);
-			}
-		});
-		return () => timers.forEach((t) => clearTimeout(t));
-	});
-
 	// Per-match form strip for the "Poengtrend" card: one bar per recent match, height
 	// = points won that match (gold = perfect tip, muted = zero). Shows form/streaks.
 	let formBars = $derived.by(() => {
@@ -1107,6 +1041,20 @@
 </header>
 
 <div class="bento home-bento stagger">
+	{#if featureBanner.visible}
+		<div class="home-feature-banner">
+			<a class="hfb-main" href={`${leagueHref}?view=matches`} onclick={() => featureBanner.dismiss()}>
+				<span class="hfb-badge">{language.text('Nytt', 'Nytt', 'New')}</span>
+				<span class="hfb-copy">
+					<b>{language.text('Se kampene i ligaen', 'Sjå kampane i ligaen', 'See the league matches')}</b>
+					<span class="muted">{language.text('Kamp for kamp: hva alle tippet og hvem som fikk poeng.', 'Kamp for kamp: kva alle tippa og kven som fekk poeng.', 'Match by match: what everyone tipped and who scored points.')}</span>
+				</span>
+				<ArrowUpRight size={18} class="hfb-go" />
+			</a>
+			<button class="hfb-x" onclick={() => featureBanner.dismiss()} aria-label={language.text('Lukk', 'Lukk', 'Dismiss')}><X size={16} /></button>
+		</div>
+	{/if}
+
 	{#if homeIntro.ready && introCardOpen}
 		<section class="card tile intro-card home-span-primary" aria-labelledby="home-intro-title">
 			<div class="intro-head">
@@ -1203,57 +1151,14 @@
 		{#if nowHero.tone === 'live' && nowHero.matches && nowHero.matches.length > 0}
 			<div class="now-live-matches">
 				{#each nowHero.matches as m (m.id)}
-					{@const events = tipsStore.liveEvents[m.id] ?? []}
-					{@const visibleEvents = decisiveEvents(events)}
-					<div class="now-match live-row" class:single={nowHero.matches.length === 1}>
-						<div class="now-teams">
-							<span>
-								{#if team(m.homeTeam)}
-									<Flag iso2={team(m.homeTeam)?.iso2 ?? ''} code={team(m.homeTeam)?.fifaCode ?? ''} size={22} />
-								{/if}
-								<b>{teamLabel(m, 'h')}</b>
-							</span>
-							<strong class="digits" class:goal-flash={!!goalFlash[m.id]}>{scoreText(m)}</strong>
-							<span class="away">
-								<b>{teamLabel(m, 'a')}</b>
-								{#if team(m.awayTeam)}
-									<Flag iso2={team(m.awayTeam)?.iso2 ?? ''} code={team(m.awayTeam)?.fifaCode ?? ''} size={22} />
-								{/if}
-							</span>
-						</div>
-						<div class="now-meta">
-							<span class="now-live-pill"><span class="live-dot" aria-hidden="true"></span>{language.text('Live', 'Live', 'Live')}</span>
-							{#if liveMinuteLabel(m)}<span class="now-minute">{liveMinuteLabel(m)}</span>{/if}
-							<span>{stageLabel(m)}</span>
-							<span>{kickoffLabel(m.kickoff)}</span>
-							{#if m.tvChannel}<TvLogo channel={m.tvChannel} compact />{/if}
-						</div>
-						{#if visibleEvents.length > 0}
-							<div class="now-events" aria-label={language.text('Live-hendelser', 'Live-hendingar', 'Live events')}>
-								{#each visibleEvents as event (event.id || event.providerKey)}
-									{@const evTeam = eventTeam(event, [team(m.homeTeam), team(m.awayTeam)])}
-									<span
-										class="event"
-										class:goal={event.type === 'Goal'}
-										class:card={event.type === 'Card'}
-										class:subst={event.type === 'subst'}
-										title={eventTitle(event, language.text('Assist', 'Assist', 'Assist'))}
-									>
-										<span class="min">{eventMinute(event)}</span>
-										<span class="event-icon">{eventIcon(event)}</span>
-											{#if evTeam}
-												<Flag iso2={evTeam.iso2} code={evTeam.fifaCode} size={14} />
-											{:else if event.team}
-												<span class="ev-team">{event.team}</span>
-											{/if}
-										<span class="player">{event.player || event.detail}</span>
-											{#if event.detail === 'Own Goal'}<span class="ev-og">{language.text('selvmål', 'sjølvmål', 'OG')}</span>{/if}
-									</span>
-								{/each}
-							</div>
-						{/if}
+					<div class="now-result-card">
+						<LeagueMatchCard match={m} leagueId={activeLeague?.id ?? ''} avatars={homeAvatars} flat showTv />
 					</div>
 				{/each}
+			</div>
+		{:else if nowHero.tone === 'result' && nowHero.match}
+			<div class="now-result-card">
+				<LeagueMatchCard match={nowHero.match} leagueId={activeLeague?.id ?? ''} avatars={homeAvatars} flat />
 			</div>
 		{:else if nowHero.match}
 			<div class="now-match">
@@ -1575,6 +1480,8 @@
 				</h3>
 				{#if tournamentFinished && finalLeaguePlacements.length > 0}
 					<a class="hdlink" href="/leagues">{language.text('Alle ligaer', 'Alle ligaer', 'All leagues')}</a>
+				{:else if activeLeague && recentResults.length > 0}
+					<a class="hdlink" href={`/leagues/${activeLeague.id}?view=matches`}>{language.text('Alle kamper', 'Alle kampar', 'All matches')}</a>
 				{/if}
 			</div>
 			{#if tournamentFinished && finalLeaguePlacements.length > 0}
@@ -1595,45 +1502,11 @@
 					{/each}
 				</div>
 			{:else}
-				<ul class="rl">
+				<div class="result-cards">
 					{#each recentResults as m (m.id)}
-						{@const t = tipsStore.tips[m.id]}
-						{@const pts = tipsStore.scores[m.id] ?? 0}
-						<li>
-							<span class="side">
-								{#if team(m.homeTeam)}
-									<Flag
-										iso2={team(m.homeTeam)?.iso2 ?? ''}
-										code={team(m.homeTeam)?.fifaCode ?? ''}
-										size={18}
-									/>
-								{/if}
-								<b>{team(m.homeTeam)?.fifaCode ?? m.homeLabel}</b>
-							</span>
-							<span class="score digits">{scoreText(m)}</span>
-							<span class="side r">
-								<b>{team(m.awayTeam)?.fifaCode ?? m.awayLabel}</b>
-								{#if team(m.awayTeam)}
-									<Flag
-										iso2={team(m.awayTeam)?.iso2 ?? ''}
-										code={team(m.awayTeam)?.fifaCode ?? ''}
-										size={18}
-									/>
-								{/if}
-							</span>
-							<span class="yp">
-								{#if t}
-									<i class="muted">{language.text('Ditt', 'Ditt', 'Yours')}: {t.ftHome}–{t.ftAway}</i>
-									<b class:plus={pts > 0} class:zero={pts === 0}
-										>{pointText(pts)}</b
-									>
-								{:else}
-									<i class="muted">{language.text('Ikke tippet', 'Ikkje tipset', 'Not tipped')}</i>
-								{/if}
-							</span>
-						</li>
+						<LeagueMatchCard match={m} leagueId={activeLeague?.id ?? ''} avatars={homeAvatars} flat />
 					{/each}
-				</ul>
+				</div>
 			{/if}
 		</section>
 	{/if}
@@ -1756,9 +1629,30 @@
 	{/if}
 
 </div>
+	<p class="home-footer">{language.text('VM 2026 · 11. juni - 19. juli', 'VM 2026 · 11. juni - 19. juli', 'World Cup 2026 · 11 June - 19 July')}</p>
 {/if}
 
 <style>
+	/* Date range sits in the hero on desktop; on mobile it moves to a footer at
+	   the bottom (and "World Cup 26" shows in the top header instead). */
+	.home-footer {
+		display: none;
+	}
+	@media (max-width: 899px) {
+		.home-hero .kicker {
+			display: none;
+		}
+		.home-footer {
+			display: block;
+			text-align: center;
+			margin: 1.5rem 0 0;
+			font-size: 0.72rem;
+			font-weight: 600;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			color: var(--muted-2);
+		}
+	}
 	.hero-bar {
 		display: flex;
 		align-items: flex-end;
@@ -2246,60 +2140,6 @@
 		);
 	}
 
-	/* ===== Recent results ===== */
-	.rl {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: grid;
-		gap: 0.55rem;
-	}
-	.rl li {
-		display: grid;
-		grid-template-columns: 1fr auto 1fr auto;
-		align-items: center;
-		gap: 0.7rem;
-		padding: 0.6rem 0.8rem;
-		background: var(--surface-2);
-		border-radius: var(--radius-sm);
-	}
-	.rl .side {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-	}
-	.rl .side.r {
-		justify-content: flex-end;
-	}
-	.rl .side b {
-		font-weight: 700;
-		font-family: var(--font-mono);
-		font-size: 0.85rem;
-	}
-	.rl .score {
-		display: inline-flex;
-		gap: 0.2rem;
-		padding: 0.2rem 0.55rem;
-		background: var(--surface-3);
-		color: var(--text);
-		border-radius: 8px;
-		font-family: var(--font-mono);
-		font-weight: 700;
-	}
-	.rl .yp {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		font-size: 0.75rem;
-	}
-	.rl .yp b {
-		color: var(--gold);
-		font-weight: 700;
-		font-family: var(--font-mono);
-		font-size: 0.85rem;
-	}
-	.rl .yp i { font-style: normal; }
-
 	/* ===== Group predictor ===== */
 	.gpl {
 		list-style: none;
@@ -2693,6 +2533,68 @@
 	.golden-boot-pick {
 		padding-top: 0.2rem;
 		border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+	}
+	.home-feature-banner {
+		grid-column: 1 / -1;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 0.75rem 0.6rem 0.85rem;
+		background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+		border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--border));
+		border-radius: 16px;
+	}
+	.hfb-main {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		flex: 1;
+		min-width: 0;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.hfb-badge {
+		flex: none;
+		font-size: 0.64rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--accent-fg);
+		background: var(--accent);
+		padding: 0.2rem 0.5rem;
+		border-radius: var(--radius-pill);
+	}
+	.hfb-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.05rem;
+		min-width: 0;
+		flex: 1;
+	}
+	.hfb-copy b {
+		font-weight: 700;
+		font-size: 0.92rem;
+	}
+	.hfb-copy .muted {
+		font-size: 0.8rem;
+	}
+	.home-feature-banner :global(.hfb-go) {
+		flex: none;
+		color: var(--accent);
+	}
+	.hfb-x {
+		flex: none;
+		background: none;
+		border: none;
+		color: var(--muted);
+		cursor: pointer;
+		display: inline-flex;
+		padding: 0.25rem;
+		border-radius: 8px;
+	}
+	.hfb-x:hover {
+		color: var(--text);
+		background: color-mix(in srgb, var(--text) 8%, transparent);
 	}
 	.home-bento {
 		gap: 0.75rem;
@@ -3483,12 +3385,6 @@
 		color: var(--muted);
 	}
 	/* removed unused: .st li variants and related rules */
-	.rl li {
-		grid-template-columns: 1fr auto 1fr;
-	}
-	.rl .yp {
-		display: none;
-	}
 
 	.podium-card {
 		gap: 0.85rem;
@@ -3741,6 +3637,11 @@
 		border-radius: 16px;
 		background: color-mix(in srgb, var(--surface-2) 82%, transparent);
 	}
+	.now-result-card {
+		padding: 0.15rem 0.9rem;
+		border-radius: 16px;
+		background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+	}
 	.now-live-matches {
 		display: grid;
 		gap: 0.7rem;
@@ -3816,30 +3717,6 @@
 			box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 0%, transparent);
 		}
 	}
-	.now-minute {
-		font-family: var(--font-mono);
-		font-variant-numeric: tabular-nums;
-		color: var(--live);
-		font-weight: 800;
-	}
-	.now-teams strong.goal-flash {
-		animation: scoreFlash 1.1s ease-out;
-	}
-	@keyframes scoreFlash {
-		0% {
-			transform: scale(1);
-		}
-		18% {
-			transform: scale(1.18);
-			color: var(--accent);
-		}
-		55% {
-			color: var(--accent);
-		}
-		100% {
-			transform: scale(1);
-		}
-	}
 	/* Points-trend form strip */
 	.form-bars {
 		display: flex;
@@ -3907,7 +3784,6 @@
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.live-dot,
-		.now-teams strong.goal-flash,
 		.league-rank-skeleton,
 		.league-rank-skeleton::after {
 			animation: none;
@@ -3916,62 +3792,6 @@
 	.now-meta :global(.tv-logo.compact) {
 		width: 60px;
 		height: 19px;
-	}
-	.now-events {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.2rem 0.45rem;
-		padding-top: 0.45rem;
-		border-top: 1px dashed color-mix(in srgb, var(--border) 76%, transparent);
-	}
-	.event {
-		display: inline-flex;
-		align-items: center;
-		min-width: 0;
-		gap: 0.22rem;
-		padding: 0;
-		border-radius: 0;
-		background: transparent;
-		color: var(--text);
-		font-size: 0.71rem;
-		font-weight: 650;
-	}
-	.event.goal {
-		color: color-mix(in srgb, var(--accent) 78%, var(--text));
-	}
-	.event.card {
-		color: color-mix(in srgb, var(--warning) 78%, var(--text));
-	}
-	.event.subst {
-		color: color-mix(in srgb, var(--accent-2) 78%, var(--text));
-	}
-	.event .min {
-		flex: none;
-		color: var(--muted);
-		font-family: var(--font-mono);
-		font-size: 0.66rem;
-	}
-	.event-icon {
-		flex: none;
-		font-size: 0.68rem;
-		line-height: 1;
-	}
-	.event .player {
-		min-width: 0;
-		overflow-wrap: anywhere;
-	}
-	.event .ev-team {
-		flex: none;
-		font-size: 0.72rem;
-		color: var(--muted);
-	}
-	.event .ev-og {
-		flex: none;
-		font-size: 0.62rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		color: var(--muted);
 	}
 	.action-card.live {
 		border-color: color-mix(in srgb, var(--live) 28%, var(--border));
@@ -4160,12 +3980,6 @@
 	.chat-preview-card.has-unread {
 		border-color: color-mix(in srgb, var(--accent) 24%, var(--border)) !important;
 	}
-	.rl li {
-		grid-template-columns: 1fr auto 1fr minmax(5.5rem, auto);
-	}
-	.rl .yp {
-		display: flex;
-	}
 
 	@media (max-width: 639px) {
 		.intro-head {
@@ -4188,14 +4002,6 @@
 		.podium-card       { order: 9; }
 		.league-gaps {
 			grid-template-columns: 1fr;
-		}
-		.rl li {
-			grid-template-columns: 1fr auto 1fr;
-		}
-		.rl .yp {
-			grid-column: 1 / -1;
-			align-items: flex-start;
-			padding-top: 0.35rem;
 		}
 	}
 	@media (min-width: 900px) {
@@ -4371,8 +4177,7 @@
 		color: #071019;
 		box-shadow: 0 16px 32px -24px rgba(232, 197, 116, 0.74);
 	}
-	:global(:root[data-theme='worldcup']) .now-teams strong,
-	:global(:root[data-theme='worldcup']) .rl .score {
+	:global(:root[data-theme='worldcup']) .now-teams strong {
 		background: rgba(5, 13, 20, 0.72);
 		border: 1px solid color-mix(in srgb, var(--gold) 13%, var(--border));
 		border-radius: 999px;
@@ -4403,7 +4208,6 @@
 	}
 	:global(:root[data-theme='worldcup']) .ready-team :global(.flag),
 	:global(:root[data-theme='worldcup']) .now-teams :global(.flag),
-	:global(:root[data-theme='worldcup']) .rl :global(.flag),
 	:global(:root[data-theme='worldcup']) .forecast-mini-podium :global(.flag),
 	:global(:root[data-theme='worldcup']) .podium-row :global(.flag) {
 		border-color: rgba(232, 197, 116, 0.28);
@@ -4411,7 +4215,6 @@
 	}
 	:global(:root[data-theme='worldcup']) .mini-lb-row,
 	:global(:root[data-theme='worldcup']) .chat-preview,
-	:global(:root[data-theme='worldcup']) .rl li,
 	:global(:root[data-theme='worldcup']) .podium-row {
 		border-bottom-color: color-mix(in srgb, var(--gold) 12%, var(--border));
 	}

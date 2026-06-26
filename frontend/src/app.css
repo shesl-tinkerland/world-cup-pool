@@ -117,6 +117,15 @@ h3 {
 	}
 }
 
+/* Tighter side gutters on phones so content (tables, match lists) uses more of
+   the screen width. */
+@media (max-width: 640px) {
+	.app-shell {
+		padding-left: 0.6rem;
+		padding-right: 0.6rem;
+	}
+}
+
 /* ---- Cards (bento tiles) ---- */
 .card {
 	position: relative;

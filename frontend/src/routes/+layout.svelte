@@ -113,6 +113,7 @@
 	<!-- Mobile: top header (logo / install / user menu) -->
 	<header class="topbar">
 		<Logo compact />
+		<span class="topbar-tag">{language.text('VM 26', 'VM 26', 'World Cup 26')}</span>
 		<div class="spacer"></div>
 		<AppSearch compact />
 		<PwaInstallButton />
@@ -163,6 +164,14 @@
 </div>
 
 <style>
+	.topbar-tag {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 0.8rem;
+		letter-spacing: 0.01em;
+		color: var(--muted);
+		white-space: nowrap;
+	}
 	.public-topbar {
 		position: fixed;
 		top: 0;
